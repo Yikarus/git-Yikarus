@@ -10,6 +10,7 @@
 #include<unordered_map>
 #include<sys/wait.h>
 #include<sys/shm.h>
+#include<sys/signal.h>
 std::unordered_map<pid_t,int> clientsockets;
 char recv_buf[1024];
 int main(){
