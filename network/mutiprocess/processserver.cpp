@@ -44,6 +44,8 @@ int main(){
             int ret=fork();
             if(ret==0)//child
             {
+                close(_sock);//close useless socket
+                sleep(1);
                 std::unordered_map<pid_t,int>::iterator index;
                 while(1){
                     index=clientsockets.find(getpid());
