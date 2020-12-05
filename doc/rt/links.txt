@@ -1,0 +1,2 @@
+从任务调度机制分析操作系统的实时性 https://blog.csdn.net/kanghe2000/article/details/72287401
+xenomai内核解析之xenomai的组成结构 http://www.gzywkj.com/post/14234.html

@@ -1,0 +1,17 @@
+list结构 强大的数组，以[]表示，可以内含各种类型，也以[]索引，支持负数索引。字符串也可视为列表或数组
+列表的切片，以:表示，[number:number]某一侧不写默认取到两边，都不写则表示整个列表
+[n1::n2]两个冒号表示从n1开始，每隔n2取一次，即表示步长
+[n1:n2:n3]表示从n1开始以n3为步长，行进n2-n1
+
+内置函数（类似类成员函数）
+append(element) 向末尾添加，以对象方式
+extend(element) 向末尾添加，若为可迭代目标，则拆得其元素放入
+insert(pos,element) 向指定索引位置插入值
+clear 还原为空列表
+pop 弹出最后值，返回该值
+remove(element) 删除第一个element元素
+index(element) 遍历列表，返回element出现的第一个索引
+count(element) element出现的次数
+sort(reverse=False) 排序，默认正序
+copy 返回副本，列表以=赋值时指向的为同一个
+reverse 原地翻转

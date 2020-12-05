@@ -1,0 +1,12 @@
+涉及协程的概念，线程内的任务调度，可提高任务效率
+列表推导式
+list=[(i,j) for i in range(8) for j in range(8) if i*j%7==6]
+字典推导式
+str=['a','b','c']
+d={i:s for i,s in enumerate(str)}建立
+d=update({i:s for i,s in enumerate(str)})增加
+集合推导式
+square={i**2 for i in [1,2,3,4,5]}
+生成器推导式
+与list相似 []改成()加快速度
+生成器返回的是iterator

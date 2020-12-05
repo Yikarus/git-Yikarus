@@ -1,0 +1,1 @@
+顶层const表现为int *const，底层const表现为const int *，顶层const表示其自身为常数，底层const表示其指向为常熟，底层const可以重载，由于其表示不同的类型，顶层const由于表示其自身，故无法区分，不能重载函数。函数类型上顶层const表示内部数据不可变，除了mutable对象，底层const表示返回类型为const对象。

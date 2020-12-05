@@ -1,0 +1,18 @@
+bin(num) 以二进制输出字符串类型
+def func(arg1,arg2=value)
+	expressions
+	return result
+tr
+def func(*args) 变长参数的支持
+	for i in args
+	...
+	return result
+tr
+lambda表达式简化函数定义
+result=lambda args:result
+对于使用一次的函数较为简单
+
+高阶函数
+map(func(x),list) 将list的每个元素以func映射到一个新的迭代器内，返回的值为一个指针，需要以list()等转化
+reduce(func(x,y),list) 对list从第一个开始，进行func，直到最后
+filter(boolfunc(x),list) 返回list中boolfunc返回true的元素组成的list的指针 bool不支持!使用not

@@ -1,0 +1,1 @@
+RTlinux是一个微内核架构，通过在Linux中增加一个实时内核RTlinux来保证实时性，当有中断到来时，总是RTlinux接收，RTlinux处理实时任务，发现不是再给linux处理，实现实时，RTlinux设有优先级，将linux优先级设为最低，RTlinux的idle就是linux，实现了不处理实时任务时才转到linux，其硬实时能达到15us。由于两个和，所以有两套API。

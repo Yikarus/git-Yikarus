@@ -1,0 +1,1 @@
+C++中，如果程序没有显式定义默认构造函数，只有四种情况会真的合成一个，1.成员对象有默认构造函数 2.基类有默认构造函数 3.成员有虚函数 4.有虚基类 虚函数以及虚基类的原因是需要构造虚函数表。这四种合成默认构造函数称为implicit nontrivial default constructor，实际干了事，其他未定义默认构造函数成为implicit trivial default constructor，实际没有用，编译器也不合成他。
