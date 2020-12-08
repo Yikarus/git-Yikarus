@@ -28,9 +28,14 @@ void str_echo(FILE* fp,int sockfd){
         fputs(recvline,stdout);
     }
 }
+void sig_handle(int signum){
+    puts("sig sleep");//simulate refuse attack
+    sleep(10);
+}
 int main(int argc ,char ** argv){
     puts("client init");
     int sockfd;
+    signal(SIGUSR1,sig_handle);
     struct sockaddr_in servaddr;
     if(argc!=3){
         return 1;
