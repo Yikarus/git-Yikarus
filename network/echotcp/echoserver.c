@@ -41,7 +41,7 @@ void child_clean(int signo){
 }
 int main(int argc ,char ** argv){
     puts("server init");
-    if(signal(SIGCHLD,child_clean)==EINVAL)puts("rigister err");
+    if(signal(SIGCHLD,child_clean)==SIG_ERR)puts("rigister err");
     int listenfd,connfd;
     pid_t childpid;
     socklen_t clilen;

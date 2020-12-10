@@ -3,6 +3,7 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<signal.h>
+#include<arpa/inet.h>
 #include<sys/poll.h>
 #include<limits.h>
 #include<unistd.h>
@@ -36,45 +37,67 @@ int main(int argc,char **argv){
         pollfdd[i].fd=-1;
     int max=0;
     while(1){
+        // sleep(1);
+        // puts("new loop");
         ready=poll(pollfdd,max+1,TIMEOUT);
+        // printf("poll ready num : %d\n",ready);
         if(pollfdd[0].revents&POLLRDNORM){
+            // puts("ready to accept");
             socklen_t len;
             clifd=accept(listenfd,(struct sockaddr*)&cliaddr,&len);
+            if(clifd==-1)err_quit("accept error");
+            
+            printf("connect remote client: %s \n",inet_ntoa(cliaddr.sin_addr));
             for(num=1;num<OPEN_MAX;num++)
                 if(pollfdd[num].fd<0)
                 {
                     pollfdd[num].fd=clifd;
-                    pollfdd[num].events=POLLRDNORM;
                     break;
                 }
+                    pollfdd[num].events=POLLRDNORM;
+            
             if(num==OPEN_MAX)err_quit("out of range of connection");
             if(num>max)max=num;
             if(--ready<=0)
                 continue;
+            // puts("quit accept");
+
         }
-        if(ready<=0)continue;
-        for(int i=1;i<max;i++){
+        //if(ready<=0)continue;
+        // printf("max num: %d \n",max);
+        for(int i=1;i<=max;i++){
             if(pollfdd[i].fd<0)
                 continue;
-            if(pollfdd[i].revents&POLLRDNORM)
+            // printf("search %d pollfd ,fd:%d\n",i,pollfdd[i].fd);
+            if(pollfdd[i].revents&POLLRDNORM)//see how to set revents because pollfd is ok not released,but followed message losen.
             {
                 int recvlen;
                 bzero(buf,1024);
                 if(-1==(recvlen=recv(pollfdd[i].fd,buf,1024,0)))err_quit("recv err");
-                if(0==recvlen)
+                else if(0==recvlen)
                 {
                     printf("client exit\n");
                     close(pollfdd[i].fd);
                     pollfdd[i].fd=-1;
                     
                 }
-                printf("in loop %d : pollfd %d\n",i,pollfdd[i].fd);
+                else
+                {
+                    send(pollfdd[i].fd,buf,sizeof(buf),0);
+                }
+                
+                // printf("in loop %d : pollfd %d\n",i,pollfdd[i].fd);
 
-                puts(buf);
+                printf("received : %s \n",buf);
                 
             }
             if(--ready<=0)
                 break;
+            
         }
+        // for(int n=0;n<=max;n++)
+        //     printf("pollfd[%d].fd:%d\n",n,pollfdd[n].fd);
+        // puts("end of one loop");
+        //now can not serve to mutithread
     }
 }
