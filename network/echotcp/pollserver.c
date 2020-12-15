@@ -4,20 +4,34 @@
 #include<sys/socket.h>
 #include<signal.h>
 #include<arpa/inet.h>
-#include<sys/poll.h>
+// #include<sys/poll.h>
 #include<limits.h>
 #include<unistd.h>
+#include<poll.h>
+// #include<signal.h>
 #include<stdlib.h>
 #include<string.h>
 #define LISTEN_NUM 5
 #define OPEN_MAX 1024
 #define TIMEOUT 100
+char buf[1024];
+
+void sig_handle(int signum){
+    puts(buf);
+}
 void err_quit(char * msgs){
     printf("error:");
     puts(msgs);
     exit(-1);
 }
+void err_continue(char * msgs){
+    printf("error:");
+    puts(msgs);
+    // exit(-1);
+}
+
 int main(int argc,char **argv){
+    signal(SIGUSR1,sig_handle);
     if(argc!=2)err_quit("<usage> : program_name port");
     int listenfd,clifd,num,ready;
     if(-1==(listenfd=socket(AF_INET,SOCK_STREAM,0)))err_quit("socket create error");
@@ -30,7 +44,6 @@ int main(int argc,char **argv){
     if(-1==listen(listenfd,LISTEN_NUM))err_quit("listen error");
     puts("listen successfully");
     struct pollfd pollfdd[1024];
-    char buf[1024];
     pollfdd[0].fd=listenfd;
     pollfdd[0].events=POLLRDNORM;
     for(int i=1;i<OPEN_MAX;i++)
@@ -40,7 +53,8 @@ int main(int argc,char **argv){
         // sleep(1);
         // puts("new loop");
         ready=poll(pollfdd,max+1,TIMEOUT);
-        // printf("poll ready num : %d\n",ready);
+        if(ready==0)continue;
+        // int nums=ready;
         if(pollfdd[0].revents&POLLRDNORM){
             // puts("ready to accept");
             socklen_t len;
@@ -58,19 +72,20 @@ int main(int argc,char **argv){
             
             if(num==OPEN_MAX)err_quit("out of range of connection");
             if(num>max)max=num;
-            if(--ready<=0)
-                continue;
+            // if(--ready<=0)
+            //     continue;
             // puts("quit accept");
 
         }
         //if(ready<=0)continue;
         // printf("max num: %d \n",max);
-        for(int i=1;i<=max;i++){
+        for(int i=1;i<=max+1;i++){
             if(pollfdd[i].fd<0)
                 continue;
             // printf("search %d pollfd ,fd:%d\n",i,pollfdd[i].fd);
             if(pollfdd[i].revents&POLLRDNORM)//see how to set revents because pollfd is ok not released,but followed message losen.
             {
+                pollfdd[i].revents=0;
                 int recvlen;
                 bzero(buf,1024);
                 if(-1==(recvlen=recv(pollfdd[i].fd,buf,1024,0)))err_quit("recv err");
@@ -87,17 +102,21 @@ int main(int argc,char **argv){
                 }
                 
                 // printf("in loop %d : pollfd %d\n",i,pollfdd[i].fd);
-
-                printf("received : %s \n",buf);
+                struct sockaddr_in peeraddr;
+                int peerlen;
+                if(-1==getpeername(pollfdd[i].fd,(struct sockaddr*)&peeraddr,&peerlen))err_continue("getpeername error");
+                printf("from remote address %s ",inet_ntoa(peeraddr.sin_addr));
+                printf("received : %s",buf);
                 
             }
-            if(--ready<=0)
-                break;
+            // if(--ready<=0)
+            //     break;
             
         }
         // for(int n=0;n<=max;n++)
         //     printf("pollfd[%d].fd:%d\n",n,pollfdd[n].fd);
         // puts("end of one loop");
         //now can not serve to mutithread
+        //problem  is  client 2 can not send to server after it connected,client 2 is blocked at send.data  is blocked in buffer
     }
 }

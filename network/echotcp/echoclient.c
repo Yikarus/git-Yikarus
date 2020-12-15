@@ -11,16 +11,27 @@
 #include<sys/signal.h>
 #include<string.h>
 #include<stdlib.h>
+char sendline[1024],recvline[1024];
+void sig_handle2(int signum){
+    printf("sendline:%s\n",sendline);
+    printf("recvline:%s\n",recvline);
+}
 void str_echo(FILE* fp,int sockfd){
-    char sendline[1024],recvline[1024];
     while(1){
         bzero(sendline,1024);
         bzero(recvline,1024);
+        printf("send: ");
         if(fgets(sendline,1024,fp)==NULL){
             puts("recv null exit"); 
             exit(1); 
         }
-        int n=write(sockfd,sendline,strlen(sendline));
+        int n=send(sockfd,sendline,strlen(sendline),0);
+        if(-1==n)
+        {
+            puts("send msgs failure");
+            return;
+        }
+        printf("received: ");
         if(read(sockfd,recvline,1024)==0){
             puts("client:server terminated permaturely");
             exit(1);
@@ -36,6 +47,7 @@ int main(int argc ,char ** argv){
     puts("client init");
     int sockfd;
     signal(SIGUSR1,sig_handle);
+    signal(SIGUSR2,sig_handle2);
     struct sockaddr_in servaddr;
     if(argc!=3){
         return 1;
