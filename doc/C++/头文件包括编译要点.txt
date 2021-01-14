@@ -1,0 +1,1 @@
+当主函数main() 中#include 了不少文件时，如果是系统的lib，则gcc自动寻找相应的静态链接文件或动态链接文件连接。但是当自己编写一套头文件的时候，如何编写以及管理则需要规范。特别是自己编写的.h和配对的.c或.cpp文件，注意几点，1、.h文件中除了系统的库文件以及extern外置生命外，不要反复#include“自己编写的.h”文件，否则会发生mutiple definition，2、C++类声明若包含复杂的反复包含例如class A{class B,class C}，#include"classB.h"和#include"classC.h"不能写在.h上，在.h文件上前置声明，在.cpp文件中#include
