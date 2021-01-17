@@ -1,4 +1,4 @@
-OBJ=echoserver echoclient pollserver ping epollserver
+OBJ=echoserver echoclient pollserver ping epollserver reconnect.c
 all:$(OBJ)
 echoserver:echoserver.c
 	gcc -o $@ -g $<
@@ -9,6 +9,8 @@ pollserver:pollserver.c
 ping:ping.c
 	gcc -o $@ -g $<
 epollserver:epollserver.c
+	gcc -o $@ -g $<
+reconnect:reconnect.c
 	gcc -o $@ -g $<
 clean:
 	rm -f $(OBJ)

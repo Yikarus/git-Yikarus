@@ -26,6 +26,7 @@ void str_echo(FILE* fp,int sockfd){
             // exit(1); 
         }
         int n=send(sockfd,sendline,strlen(sendline),0);
+        
         if(-1==n)
         {
             puts("send msgs failure");
@@ -34,7 +35,7 @@ void str_echo(FILE* fp,int sockfd){
         printf("received: ");
         if(read(sockfd,recvline,1024)==0){
             puts("client:server terminated permaturely");
-            // exit(1);
+            return;
         }
         fputs(recvline,stdout);
     }
@@ -52,22 +53,35 @@ int main(int argc ,char ** argv){
     if(argc!=3){
         return 1;
     }
-    sockfd=socket(AF_INET,SOCK_STREAM,0);
-    if(sockfd==-1)puts("socket err");
-    bzero(&servaddr,sizeof(servaddr));
-    servaddr.sin_family=AF_INET;
-    servaddr.sin_port=htons(atoi(argv[2]));
+        // sockfd=socket(AF_INET,SOCK_STREAM,0);
+        if(sockfd==-1)puts("socket err");
+        bzero(&servaddr,sizeof(servaddr));
+        servaddr.sin_family=AF_INET;
+        servaddr.sin_port=htons(atoi(argv[2]));
     // servaddr.sin_addr.s_addr=inet_addr("127.0.0.1");
-    inet_pton(AF_INET,argv[1],&servaddr.sin_addr.s_addr);
+        inet_pton(AF_INET,argv[1],&servaddr.sin_addr.s_addr);
     // int err=-1;
     while(1){
-        int err=connect(sockfd,(struct sockaddr*)&servaddr,sizeof(servaddr));
-        if(-1==err)puts("connect err");
+        int sockdf=socket(AF_INET,SOCK_STREAM,0);
+    //     sockfd=socket(AF_INET,SOCK_STREAM,0);
+    //     if(sockfd==-1)puts("socket err");
+    //     bzero(&servaddr,sizeof(servaddr));
+    //     servaddr.sin_family=AF_INET;
+    //     servaddr.sin_port=htons(atoi(argv[2]));
+    // // servaddr.sin_addr.s_addr=inet_addr("127.0.0.1");
+    //     inet_pton(AF_INET,argv[1],&servaddr.sin_addr.s_addr);
+        printf("socket = %d servaddr = %d\n",sockdf,servaddr.sin_port);
+        int err=connect(sockdf,(struct sockaddr*)&servaddr,sizeof(servaddr));
+        if(-1==err){
+            puts("connect err");
+            sleep(rand()%10);
+            }
         else if(0==err)
         {
             puts("connect successfully");
-            str_echo(stdin,sockfd);
+            str_echo(stdin,sockdf);
         }
+        close(sockdf);
     }
     exit(0);
 }
