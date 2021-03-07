@@ -1,0 +1,12 @@
+观看侯捷《STL源码剖析》总结。
+	STL有六大组件，
+	1、容器，containers，是各种数据结构，有，vector,list,deque,set,map用来存放数据。
+	2、算法，algorithms，是定义的在容器中的各种操作，如sort,search,copy,erase,find等，算法有通用的，和特殊的，与容器深度耦合的，特别有些容器不适用于通用算法。
+	3、迭代器，扮演容器和算法之间的桥梁，为了将算法通用于各大容器引入的中间层，以相同格式编写的容器，即具有正确迭代器的容器可以使用现有的算法，提高代码复用。
+	4、仿函数，行为类似于函数，仿函数是一种重载了operator()的类或模板类，可以编写仿函数用于支持类的比较，作为算法的一种策略。
+	5、配接器，adapters，也称适配器，在已有容器或算法基础上进行封装，使之适用于另一种容器或算法，类似stack，可称为容器，但是其底层都是deque实现，只是针对其进行了封装。
+	6、配置器，allocators，负责空间的配置与管理，实现了动态空间配置、空间管理，空间释放的类模板，最简单的是类似new，delete的功能实现，allocators也需要满足一定的格式，将new,delete或malloc,free进行封装即可制作最简单的配置器。
+	书中首先重点讲了STL的基石，空间配置器，SGI之前有的配置器，默认为allocator，只是简单的实现了::operator new,::operator delete，SGI则使用了更棒的策略实现了两级分配，SGI内部也提供简单的allocator，但是只简单的封装operator new,和operator delete，他默认的分配器是alloc。
+	构造一个类可以分为两步，分配一定的大小，构造他，析构一个对象也是两步，析构对象，回收内存。alloc将其细化，分为allocate分配内存，construct构造对象，destroy析构对象，deallocate释放内存，分的更加细致有利于进一步优化，容器中空间配置器有其必须的接口，allocator::value_type,pointer,const_pointer,reference,const_reference,size_type,difference_type,其通过这些types可以判别是否可以优化，例如如果value_type具有trivial constructor，说明他的构造函数未作有意义的事，可以省略。
+	SGI考虑空间的利用效率，以及小区块可能存在的破碎问题，设计了双层配置器，第一层直接使用malloc()和free()，第二级根据大小使用不同策略，大小超过128bytes，视为足够大，使用第一级，否则使用第二级，第二级配置器维护16个自由链表，每8bytes设一级，分配时先以第一级配置器分配内存池。
+	SGI提供的内存基本工具有五个，construct,destroy,uninitialized_copy,uninitialized_fill,unitialized_fill_n，利用了value_type，型别判断是否是POD类别，就是C语言中的旧类型，不需要construct，利用这些可以将分配空间和构造分开，利于实现自己分配器，复制或构造时判断是否时POD类型，是则调用高级fill,copy直接复制内存，否则需要调用constructor一个个构造，所以提高一定的效率。
